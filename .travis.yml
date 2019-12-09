@@ -9,8 +9,13 @@ jobs:
     os: linux
     if: type = cron
     script:
+    # first validate that get.keptn.sh hosts the same file as in the current src folder
+    - curl -L https://get.keptn.sh --output get.sh
+    - diff get.sh src/get.sh || travis_terminate 1
+    # then validate that installing works as expected
     - curl -sL https://get.keptn.sh | sudo -E bash
     - keptn version
+    
     
   # cron: always test that get.keptn.sh works on osx
   - os: osx
