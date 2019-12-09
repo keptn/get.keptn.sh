@@ -43,10 +43,10 @@ jobs:
     script:
     - cat src/get.sh | sudo -E bash
     - keptn version
-    # deploy:
-      # provider: s3
+    deploy:
+      provider: s3
       # we will only deploy files from the src folder
-      # local_dir: src
-      # access_key_id: "YOUR AWS ACCESS KEY"
-      # secret_access_key: "YOUR AWS SECRET KEY"
-      # bucket: "get.keptn.sh"
+      local_dir: src
+      access_key_id: "$AWS_ACCESS_KEY"
+      secret_access_key: "$AWS_SECRET"
+      bucket: "get.keptn.sh"

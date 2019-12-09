@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# latest GA release
 KEPTN_VERSION="0.5.2"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
