@@ -9,15 +9,20 @@ jobs:
     os: linux
     if: type = cron
     script:
-    - curl -sL https://get.keptn.sh | sudo -E bash
+    # first validate that get.keptn.sh hosts the same file as in the current src folder
+    - curl -L https://get.keptn.sh --output get.sh
+    - diff get.sh src/get.sh || travis_terminate 1
+    # then validate that installing works as expected
+    - curl -sL https://get.keptn.sh | sudo -E bash || travis_terminate 2
     - keptn version
+    
     
   # cron: always test that get.keptn.sh works on osx
   - os: osx
     stage: cron osx
     if: type = cron
     script:
-    - curl -sL https://get.keptn.sh | sudo -E bash
+    - curl -sL https://get.keptn.sh | sudo -E bash || travis_terminate 2
     - keptn version
 
   # any change in this repo: check if get.sh works on linux
@@ -25,7 +30,7 @@ jobs:
     os: linux
     script:
     # get the content of get.sh and pipe it into a sudo bash (same as if we would call curl)
-    - cat src/get.sh | sudo -E bash
+    - cat src/get.sh | sudo -E bash || travis_terminate 2
     - keptn version
 
   # any change in this repo: check if get.sh works on osx
@@ -33,7 +38,7 @@ jobs:
     os: osx
     script:
     # get the content of get.sh and pipe it into a sudo bash (same as if we would call curl)
-    - cat src/get.sh | sudo -E bash
+    - cat src/get.sh | sudo -E bash || travis_terminate 2
     - keptn version
 
   # if anything gets pushed to master we want to update our S3 bucket
@@ -58,3 +63,13 @@ jobs:
       access_key_id: "$AWS_ACCESS_KEY"
       secret_access_key: "$AWS_SECRET"
       bucket: "get.keptn.sh"
+    after_deploy:
+      # validate that the deployment has succeeded
+      # first wait a little bit, as s3 might take some time to update 
+      - sleep 10
+      # then try to download get.sh and validate the content is the same as in src/
+      - curl -L https://get.keptn.sh --output get.sh
+      - diff get.sh src/get.sh || travis_terminate 1
+      # finally try to install it
+      - curl -sL https://get.keptn.sh | sudo -E bash || travis_terminate 2
+      - keptn version
