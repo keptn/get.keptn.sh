@@ -1,0 +1,52 @@
+language: bash
+sudo: true
+
+
+jobs:
+  include:
+  # cron: always test that get.keptn.sh works on linux
+  - stage: cron linux
+    os: linux
+    if: type = cron
+    script:
+    - curl -sL https://get.keptn.sh | sudo -E bash
+    - keptn version
+    
+  # cron: always test that get.keptn.sh works on osx
+  - os: osx
+    stage: cron osx
+    if: type = cron
+    script:
+    - curl -sL https://get.keptn.sh | sudo -E bash
+    - keptn version
+
+  # any change in this repo: check if get.sh works on linux
+  - stage: test linux
+    os: linux
+    script:
+    # get the content of get.sh and pipe it into a sudo bash (same as if we would call curl)
+    - cat src/get.sh | sudo -E bash
+    - keptn version
+
+  # any change in this repo: check if get.sh works on osx
+  - stage: test osx
+    os: osx
+    script:
+    # get the content of get.sh and pipe it into a sudo bash (same as if we would call curl)
+    - cat src/get.sh | sudo -E bash
+    - keptn version
+
+  # if anything gets pushed to master we want to update our S3 bucket
+  - stage: push to s3
+    if: branch = master AND NOT type = pull_request
+    os: linux
+    script:
+    - cat src/get.sh | sudo -E bash
+    - keptn version
+    # deploy:
+      # provider: s3
+      # we will only deploy files from the src folder
+      # local_dir: src
+      # access_key_id: "YOUR AWS ACCESS KEY"
+      # secret_access_key: "YOUR AWS SECRET KEY"
+      # bucket: "get.keptn.sh"

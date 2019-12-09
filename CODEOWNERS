@@ -1,0 +1,15 @@
+##############################################################
+#
+# List of approvers for the get.keptn.sh repo
+#
+##############################################################
+#
+# Get in touch with us via the Keptn Community
+#  https://github.com/keptn/community
+# 
+#
+# Learn about CODEOWNERS file format: 
+#  https://help.github.com/en/articles/about-code-owners
+#
+
+* @dirkwall @AloisReitbauer @christian-kreuzberger-dtx
