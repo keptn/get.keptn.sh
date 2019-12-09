@@ -13,12 +13,22 @@ else
 fi
 
 echo "Downloading keptn $KEPTN_VERSION for $DISTR from GitHub..."
-curl -L "https://github.com/keptn/keptn/releases/download/${KEPTN_VERSION}/${KEPTN_VERSION}_keptn-${DISTR}.tar" --output keptn-install-${KEPTN_VERSION}.tar
+
+# try to download .tar.gz version (available starting 0.6.0.beta2)
+curl -L "https://github.com/keptn/keptn/releases/download/${KEPTN_VERSION}/${KEPTN_VERSION}_keptn-${DISTR}.tar.gz" --output keptn-install-${KEPTN_VERSION}.tar --fail
 
 curl_exit_status=$?
+
 if [ $curl_exit_status -ne 0 ]; then
-    echo "An error occured while trying to download keptn."
-    exit $curl_exit_status
+    # trying .tar version now
+    curl -L "https://github.com/keptn/keptn/releases/download/${KEPTN_VERSION}/${KEPTN_VERSION}_keptn-${DISTR}.tar" --output keptn-install-${KEPTN_VERSION}.tar --fail
+
+    curl_exit_status=$?
+
+    if [ $curl_exit_status -ne 0 ]; then
+        echo "An error occured while trying to download keptn."
+        exit $curl_exit_status
+    fi
 fi
 
 echo "Unpacking to /tmp ...";
