@@ -41,8 +41,16 @@ jobs:
     if: branch = master AND NOT type = pull_request
     os: linux
     script:
-    - cat src/get.sh | sudo -E bash
-    - keptn version
+      # ensure only two files exist in src folder
+      - NUM_FILES=$(ls -1 src/ | wc -l)
+      - |
+        if [ $NUM_FILES -ne 2 ]; then
+          echo "Unexpected files found in src/ folder"
+          ls -la src/
+          travis_terminate 1
+        fi
+      - cat src/get.sh || travis_terminate 1
+      - cat src/version.json || travis_terminate 1
     deploy:
       provider: s3
       # we will only deploy files from the src folder
