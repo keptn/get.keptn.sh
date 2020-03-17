@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # latest GA release
-KEPTN_VERSION="0.6.0"
+KEPTN_VERSION="0.6.1"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
         DISTR="linux"
