@@ -5,6 +5,6 @@
     }, 
     "bridge": {
         "stable": [ "0.5.2", "0.6.2"],
-        "prerelease": ["0.7.0.EAP"]
+        "prerelease": ["0.7.0-eap20200617"]
     }
 }
