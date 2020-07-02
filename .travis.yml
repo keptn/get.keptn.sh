@@ -54,6 +54,7 @@ jobs:
           ls -la src/
           travis_terminate 1
         fi
+      # ensure that get.sh and version.json exist in src folder
       - cat src/get.sh || travis_terminate 1
       - cat src/version.json || travis_terminate 1
     deploy:
