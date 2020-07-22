@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # latest GA release
-KEPTN_VERSION=${KEPTN_VERSION:-"0.6.2"}
+KEPTN_VERSION=${KEPTN_VERSION:-"0.7.0"}
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
         DISTR="linux"
@@ -44,4 +44,4 @@ echo "Moving keptn binary to /usr/local/bin/keptn"
 chmod +x /tmp/keptn
 mv /tmp/keptn /usr/local/bin/keptn
 
-echo "keptn is now ready!"
+echo "Keptn is now ready"

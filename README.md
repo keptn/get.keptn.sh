@@ -13,7 +13,7 @@ If a new Keptn GA release is published on GitHub we will create a Pull Request i
 
 Currently, the following parameters are available:
 
-* `KEPTN_VERSION` (points to a GitHub Release of [keptn/keptn](https://github.com/keptn/keptn/releases)), e.g., `0.6.2`
+* `KEPTN_VERSION` (points to a GitHub Release of [keptn/keptn](https://github.com/keptn/keptn/releases)), e.g., `0.7.0`
 
 # License
 
