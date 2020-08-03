@@ -2,8 +2,15 @@
 
 # latest GA release
 KEPTN_VERSION=${KEPTN_VERSION:-"0.7.0"}
+UNAME="$(uname)"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        DISTR="linux"
+<<<<<<< HEAD
+elif [[ "$UNAME" == "Linux" ]]; then
+=======
+if [[ "$(uname)" == "Linux" ]]; then
+>>>>>>> 4fff11a... add OS check to support docker
         DISTR="linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
         DISTR="macOS"
