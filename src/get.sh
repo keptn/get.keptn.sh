@@ -2,8 +2,11 @@
 
 # latest GA release
 KEPTN_VERSION=${KEPTN_VERSION:-"0.7.0"}
+UNAME="$(uname)"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        DISTR="linux"
+elif [[ "$UNAME" == "Linux" ]]; then
         DISTR="linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
         DISTR="macOS"
