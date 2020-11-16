@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # latest GA release
-KEPTN_VERSION=${KEPTN_VERSION:-"0.7.2"}
+KEPTN_VERSION=${KEPTN_VERSION:-"0.7.3"}
 UNAME="$(uname)"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
