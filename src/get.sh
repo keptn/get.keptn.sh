@@ -1,7 +1,30 @@
 #!/bin/sh
 
-# latest GA release
-KEPTN_VERSION=${KEPTN_VERSION:-"0.7.3"}
+# Define handy functions
+get_latest_version(){
+   curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' 
+}
+
+print_after_installation_info(){
+    echo "Installation completed!"
+    # TODO
+}
+
+# Verify curl is installed
+if ! [ -x "$(command -v curl)" ]; then
+    echo "cURL is not installed! Please install it to continue!"
+    exit 1
+fi
+
+# If KEPTN_VERSION is not provided -> automatically detemine latest version 
+if [[ -z "$KEPTN_VERSION" ]]; then
+    KEPTN_VERSION=$(get_latest_version)
+    printf "The newest version of Keptn is: %s and will be used automatically.\n" "${KEPTN_VERSION}"
+else
+    KEPTN_VERSION=${KEPTN_VERSION}
+    printf "Will use provided Keptn version %s.\n" "${KEPTN_VERSION}"
+fi
+
 UNAME="$(uname)"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -47,4 +70,4 @@ echo "Moving keptn binary to /usr/local/bin/keptn"
 chmod +x /tmp/keptn
 mv /tmp/keptn /usr/local/bin/keptn
 
-echo "Keptn is now ready"
+print_after_installation_info
