@@ -6,8 +6,26 @@ get_latest_version(){
 }
 
 print_after_installation_info(){
-    echo "Installation completed!"
-    # TODO
+    printf "Installation is successfully completed!"
+    printf "\n"
+    printf "You can check Keptn installation by running:"
+    printf "\n"
+    printf "\n"
+    printf "keptn --help"
+    printf "\n"
+    printf "\n"
+    printf "Next step you might be interested in is the installation on your cluster. "
+    printf "You can follow the docmentation under https://keptn.sh/docs/ "
+    printf "or simply start off by installing Keptn Control Plane via:"
+    printf "\n"
+    printf "\n"
+    printf "keptn install"
+    printf "\n"
+    printf "\n"
+    printf "Also, you can find many helpful tutorials in https://tutorials.keptn.sh/"
+    printf "\n"
+    printf "Good luck!"
+    printf "\n"
 }
 
 # Verify curl is installed
@@ -16,13 +34,18 @@ if ! [ -x "$(command -v curl)" ]; then
     exit 1
 fi
 
-# If KEPTN_VERSION is not provided -> automatically detemine latest version 
+# If KEPTN_VERSION is not provided -> automatically determine latest version 
 if [[ -z "$KEPTN_VERSION" ]]; then
     KEPTN_VERSION=$(get_latest_version)
-    printf "The newest version of Keptn is: %s and will be used automatically.\n" "${KEPTN_VERSION}"
+    printf "The newest version of Keptn is %s and will be used automatically.\n" "${KEPTN_VERSION}"
 else
+    AVAILABLE_VERSIONS=(`curl --silent "https://api.github.com/repos/keptn/keptn/releases" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`)
+    if [[ ! " ${AVAILABLE_VERSIONS[@]} " =~ " ${KEPTN_VERSION} " ]]; then
+        printf "Selected version %s is invalid, please make sure you use proper Keptn tag!\n" "${KEPTN_VERSION}"
+        exit 1
+    fi
     KEPTN_VERSION=${KEPTN_VERSION}
-    printf "Will use provided Keptn version %s.\n" "${KEPTN_VERSION}"
+    printf "We'll install specified Keptn version %s.\n" "${KEPTN_VERSION}"
 fi
 
 UNAME="$(uname)"
