@@ -19,6 +19,7 @@ jobs:
     
   # cron: always test that get.keptn.sh works on osx
   - os: osx
+    osx_image: xcode12.2
     stage: cron osx
     if: type = cron
     script:
@@ -36,6 +37,7 @@ jobs:
   # any change in this repo: check if get.sh works on osx
   - stage: test osx
     os: osx
+    osx_image: xcode12.2
     script:
     # get the content of get.sh and pipe it into a sudo bash (same as if we would call curl)
     - cat src/get.sh | sudo -E bash || travis_terminate 2
