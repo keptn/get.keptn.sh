@@ -1,7 +1,12 @@
 #!/bin/sh
 
+
+function get_latest_version() {
+  curl --silent "https://api.github.com/repos/keptn/keptn/releases" | grep -o 'releases/tag/[0-9]*.[0-9]*.[0-9]*[.A-Za-z0-9]*'  | sort --version-sort | tail -1 | awk -F'/' '{ print $3}'
+}
+
 # latest GA release
-KEPTN_VERSION=${KEPTN_VERSION:-"0.7.3"}
+KEPTN_VERSION=$(get_latest_version)
 UNAME="$(uname)"
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
