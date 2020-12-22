@@ -1,0 +1,32 @@
+name: Validate content
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 3 * * *' # run integration tests at 3 AM every day
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate-content:
+    name: Validate content
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: Check out code.
+        uses: actions/checkout@v2
+      - name: Compare Content of get.sh with content of https://get.keptn.sh
+        run: |
+          curl -L https://get.keptn.sh --output get.sh
+          diff get.sh src/get.sh || exit 1
+
+  try-install-from-quickstart:
+    name: Test get.keptn.sh/get.sh
+    strategy:
+      matrix:
+        platform: [ ubuntu-20.04, macOS-11.0 ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Trying installing Keptn using curl get.keptn.sh (QuickStart)
+        run: curl -sL https://get.keptn.sh | sudo -E bash
+      - name: Verify Keptn CLI works
+        run: keptn version
