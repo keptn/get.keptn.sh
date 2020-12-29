@@ -43,5 +43,5 @@ jobs:
           curl -L https://get.keptn.sh --output get.sh
           diff get.sh src/get.sh || exit 1
           # finally try to install it
-          curl -sL https://get.keptn.sh | sudo -E bash || exit 2
+          curl -sL https://get.keptn.sh | bash || exit 2
           keptn version
