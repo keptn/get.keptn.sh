@@ -2,11 +2,11 @@
 
 # Define handy functions
 get_latest_version(){
-   curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
+   curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
 }
 
 get_all_versions(){
-    curl --silent "https://api.github.com/repos/keptn/keptn/releases" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
+    curl --silent "https://api.github.com/repos/keptn/keptn/releases" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
 }
 
 print_after_installation_info(){
@@ -47,6 +47,7 @@ else
     AVAILABLE_VERSIONS=(`get_all_versions`)
     if [[ ! " ${AVAILABLE_VERSIONS[@]} " =~ " ${KEPTN_VERSION} " ]]; then
         printf "Selected version %s is invalid, please make sure you use proper Keptn release version!\n" "${KEPTN_VERSION}"
+        echo "Available versions are: ${AVAILABLE_VERSIONS[@]}"
         exit 1
     fi
     KEPTN_VERSION=${KEPTN_VERSION}
