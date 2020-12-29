@@ -27,6 +27,6 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Trying installing Keptn using curl get.keptn.sh (QuickStart)
-        run: curl -sL https://get.keptn.sh | sudo -E bash
+        run: curl -sL https://get.keptn.sh | bash
       - name: Verify Keptn CLI works
         run: keptn version

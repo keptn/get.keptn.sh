@@ -1,2 +1,7 @@
 .idea/
 .vscode/
+
+# potential binaries/downloads from github when testing get.sh
+keptn
+*.tar.gz
+

@@ -24,6 +24,10 @@ jobs:
       - name: Check out code.
         uses: actions/checkout@v2
       - name: Try installing Keptn using local get.sh (quickstart)
-        run: cat src/get.sh | sudo -E bash
-      - name: Verify Keptn CLI works
+        run: cat src/get.sh | bash
+      - name: Verify Keptn CLI works (Windows)
+        if: runner.os == 'Windows'
+        run: ./keptn version
+      - name: Verify Keptn CLI works (Linux, MacOS)
+        if: runner.os != 'Windows'
         run: keptn version

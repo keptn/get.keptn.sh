@@ -1,5 +1,18 @@
 #!/bin/bash
 
+########################################################################################################################
+# get.keptn.sh / get.sh                                                                                                #
+# Quickstart for installing Keptn CLI on several platforms                                                             #
+# see https://github.com/keptn/get.keptn.sh for more details                                                           #
+#                                                                                                                      #
+# This script is licenced under Apache License 2.0, see https://github.com/keptn/get.keptn.sh/blob/master/LICENSE      #
+# In addition, parts of this script are copied from or inspired by:                                                    #
+# * Istios Quickstart: https://github.com/istio/istio/blob/master/release/downloadIstioCandidate.sh                    #
+#                      Apache License 2.0, https://github.com/istio/istio/blob/master/LICENSE                          #
+# * Helm Quickstart: https://github.com/helm/helm/blob/master/scripts/get-helm-3                                       #
+#                    Apache License 2.0, https://github.com/helm/helm/blob/master/LICENSE                              #
+########################################################################################################################
+
 # Define handy functions
 get_latest_version(){
    curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
@@ -10,13 +23,15 @@ get_all_versions(){
 }
 
 print_after_installation_info(){
+    TARGET_DIR=${1:-""}
+
     printf "\n"
     printf "Installation is successfully completed!"
     printf "\n"
     printf "You can check Keptn installation by running:"
     printf "\n"
     printf "\n"
-    printf "keptn --help"
+    printf "${TARGET_DIR}keptn --help"
     printf "\n"
     printf "\n"
     printf "Next step you might be interested in is the installation on your cluster. "
@@ -24,7 +39,7 @@ print_after_installation_info(){
     printf "or simply start off by installing Keptn Control Plane via:"
     printf "\n"
     printf "\n"
-    printf "keptn install"
+    printf "${TARGET_DIR}keptn install"
     printf "\n"
     printf "\n"
     printf "Also, you can find many helpful tutorials in https://tutorials.keptn.sh/"
@@ -33,9 +48,38 @@ print_after_installation_info(){
     printf "\n"
 }
 
+runAsRoot() {
+    CMD="$*"
+
+    if [[ $EUID == 0 ]] || [[ ${USE_SUDO} == "false" ]]; then
+        $CMD
+    else
+        echo "Trying to run $CMD with sudo..."
+        sudo $CMD
+    fi
+}
+
+# Verify sudo is available
+if ! [ -x "$(command -v sudo)" ]; then
+    echo "sudo is not available! Installation might fail..."
+    USE_SUDO=false
+fi
+
 # Verify curl is installed
 if ! [ -x "$(command -v curl)" ]; then
     echo "cURL is not installed! Please install it to continue!"
+    exit 1
+fi
+
+# Verify tar is installed
+if ! [ -x "$(command -v tar)" ]; then
+    echo "tar is not installed! Please install it to continue!"
+    exit 1
+fi
+
+# Verify awk is installed
+if ! [ -x "$(command -v awk)" ]; then
+    echo "awk is not installed! Please install it to continue!"
     exit 1
 fi
 
@@ -91,19 +135,31 @@ else
     exit 1
 fi
 
+# allow customizing install directory
+if [[ -z "$INSTALL_DIRECTORY" ]]; then
+    # if we are not on windows, we know that we should install to /usr/local/bin
+    if [[ "$DISTR" != "windows" ]]; then
+        INSTALL_DIRECTORY="/usr/local/bin"
+    fi
+fi
 
 # Keptn 0.8.0-alpha and above support arch, strip MAJOR and MINOR version so we can compare it
 ARCH_UNSUPPORTED_MAJOR_MINOR="0.8"
 KEPTN_VERSION_MAJOR_MINOR=$(echo "$KEPTN_VERSION" | awk 'match($0, /[0-9]+.[0-9]+*/) { print substr( $0, RSTART, RLENGTH )}' )
 
 if [ "$(expr "${KEPTN_VERSION_MAJOR_MINOR}" \>= "${ARCH_UNSUPPORTED_MAJOR_MINOR}")" -eq 1 ]; then
-  # for Keptn 0.8.x and newer we the format is: keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz
-  FILENAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz"
-  BINARY_NAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}*"
+    # for Keptn 0.8.x and newer we the format is: keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz
+    FILENAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz"
+    BINARY_NAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}*"
 else
-  # for Keptn 0.7.x and older we need to try the old format: ${KEPTN_VERSION}_keptn-${DISTR}.tar
-  FILENAME="${KEPTN_VERSION}_keptn-${DISTR}.tar"
-  BINARY_NAME="keptn"
+    # for Keptn 0.7.x and older we need to try the old format: ${KEPTN_VERSION}_keptn-${DISTR}.tar
+    FILENAME="${KEPTN_VERSION}_keptn-${DISTR}.tar"
+    BINARY_NAME="keptn"
+fi
+
+# ensure binary name is properly set for windows
+if [[ "$DISTR" == "windows" ]]; then
+    BINARY_NAME="${BINARY_NAME}.exe"
 fi
 
 URL="https://github.com/keptn/keptn/releases/download/${KEPTN_VERSION}/${FILENAME}"
@@ -118,8 +174,8 @@ if [ $curl_exit_status -ne 0 ]; then
     exit $curl_exit_status
 fi
 
-echo "Unpacking to /tmp ...";
-tar -C /tmp -xvf ${FILENAME}
+echo "Unpacking archive ${FILENAME} in current directory ...";
+tar -xvf ${FILENAME}
 
 tar_exit_status=$?
 if [ $tar_exit_status -ne 0 ]; then
@@ -130,21 +186,34 @@ fi
 # Cleanup: remove the archive
 rm ${FILENAME}
 
-# verifying that /tmp/keptn exists
-ls -la /tmp/${BINARY_NAME}
+# verifying that the binary exists
+ls -la ${BINARY_NAME}
 
 if [ $? -ne 0 ]; then
     echo "Keptn binary ${BINARY_NAME} was not successfully extracted"
     exit -1
 fi
 
-echo "Moving keptn binary to /usr/local/bin/keptn"
-chmod +x /tmp/${BINARY_NAME}
-mv /tmp/${BINARY_NAME} /usr/local/bin/keptn
+# make sure the binary is executable
+chmod +x ${BINARY_NAME}
 
-if [ $? -ne 0 ]; then
-    echo "Error: Could not move keptn binary to /usr/local/bin"
-    exit -1
+if [[ -z ${INSTALL_DIRECTORY} ]]; then
+    echo "Keptn CLI has been downloaded to your current working directory."
+
+    # print some additional info
+    print_after_installation_info "./"
+else
+    # Move it to an installable directory
+    echo "Moving keptn binary to ${INSTALL_DIRECTORY}"
+    runAsRoot mv ${BINARY_NAME} ${INSTALL_DIRECTORY}/keptn
+
+    if [ $? -ne 0 ]; then
+        echo "Error: Could not move keptn binary to /usr/local/bin"
+        exit -1
+    fi
+
+    # print some additional info
+    print_after_installation_info
 fi
 
-print_after_installation_info
+
