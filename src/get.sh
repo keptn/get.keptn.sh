@@ -200,6 +200,8 @@ chmod +x ${BINARY_NAME}
 if [[ -z ${INSTALL_DIRECTORY} ]]; then
     echo "Keptn CLI has been downloaded to your current working directory."
 
+    mv ${BINARY_NAME} keptn
+
     # print some additional info
     print_after_installation_info "./"
 else
