@@ -1,15 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 
 # Define handy functions
 get_latest_version(){
-   curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
+   curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
 }
 
 get_all_versions(){
-    curl --silent "https://api.github.com/repos/keptn/keptn/releases" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
+    curl --silent "https://api.github.com/repos/keptn/keptn/releases" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
 }
 
 print_after_installation_info(){
+    printf "\n"
     printf "Installation is successfully completed!"
     printf "\n"
     printf "You can check Keptn installation by running:"
@@ -45,37 +46,79 @@ if [[ -z "$KEPTN_VERSION" ]]; then
 else
     AVAILABLE_VERSIONS=(`get_all_versions`)
     if [[ ! " ${AVAILABLE_VERSIONS[@]} " =~ " ${KEPTN_VERSION} " ]]; then
-        printf "Selected version %s is invalid, please make sure you use proper Keptn tag!\n" "${KEPTN_VERSION}"
+        printf "Selected version %s is invalid, please make sure you use proper Keptn release version!\n" "${KEPTN_VERSION}"
         exit 1
     fi
     KEPTN_VERSION=${KEPTN_VERSION}
     printf "We'll install specified Keptn version %s\n" "${KEPTN_VERSION}"
 fi
 
+
+# Detect Operating System
 UNAME="$(uname)"
 
+# see https://stackoverflow.com/a/8597411 for some more info
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        DISTR="linux"
+    DISTR="linux"
 elif [[ "$UNAME" == "Linux" ]]; then
-        DISTR="linux"
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-        DISTR="macOS"
+    DISTR="linux"
+elif [[ "$OSTYPE" == "darwin"* ]]; then # mac os
+    DISTR="macOS"
+elif [[ "$OSTYPE" == "mingw"* ]] || [[ "$OSTYPE" == "msys" ]]; then # some sort of bash on windows
+    DISTR="windows"
 else
-       echo "Unknown OS type $OSTYPE"
-       exit 1
+    echo "Unknown OS type $OSTYPE. Please manually download a release from https://github.com/keptn/keptn/releases."
+    exit 1
 fi
 
-echo "Downloading keptn $KEPTN_VERSION for $DISTR from GitHub..."
-curl -L "https://github.com/keptn/keptn/releases/download/${KEPTN_VERSION}/${KEPTN_VERSION}_keptn-${DISTR}.tar" --output keptn-install-${KEPTN_VERSION}.tar
+# if TARGET_ARCH is not provided, determine it using uname -m
+if [[ -z "$TARGET_ARCH" ]]; then
+    TARGET_ARCH=$(uname -m)
+    printf "Determined target architecture %s\n" "$TARGET_ARCH"
+else
+    printf "Using provided target architecture %s\n" "$TARGET_ARCH"
+fi
+
+if [[ "$TARGET_ARCH" == "x86_64" ]] || [[ "$TARGET_ARCH" == "amd64" ]]; then
+    KEPTN_ARCH="amd64"
+elif [[ "$TARGET_ARCH" == "armv8"* ]] || [[ "$TARGET_ARCH" == "aarch64"* ]] || [[ "$TARGET_ARCH" == "arm64" ]]; then
+    KEPTN_ARCH="arm64"
+elif [[ "$TARGET_ARCH" == "i386" ]] || [[ "$TARGET_ARCH" == "386" ]]; then
+    KEPTN_ARCH="386"
+else
+    echo "Unsupported target architecture $TARGET_ARCH. Please manually download a release from https://github.com/keptn/keptn/releases."
+    exit 1
+fi
+
+
+# Keptn 0.8.0-alpha and above support arch, strip MAJOR and MINOR version so we can compare it
+ARCH_UNSUPPORTED_MAJOR_MINOR="0.8"
+KEPTN_VERSION_MAJOR_MINOR=$(echo "$KEPTN_VERSION" | awk 'match($0, /[0-9]+.[0-9]+*/) { print substr( $0, RSTART, RLENGTH )}' )
+
+if [ "$(expr "${KEPTN_VERSION_MAJOR_MINOR}" \>= "${ARCH_UNSUPPORTED_MAJOR_MINOR}")" -eq 1 ]; then
+  # for Keptn 0.8.x and newer we the format is: keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz
+  FILENAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz"
+  BINARY_NAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}*"
+else
+  # for Keptn 0.7.x and older we need to try the old format: ${KEPTN_VERSION}_keptn-${DISTR}.tar
+  FILENAME="${KEPTN_VERSION}_keptn-${DISTR}.tar"
+  BINARY_NAME="keptn"
+fi
+
+URL="https://github.com/keptn/keptn/releases/download/${KEPTN_VERSION}/${FILENAME}"
+
+echo "Downloading keptn $KEPTN_VERSION for OS $DISTR with architecture $KEPTN_ARCH from GitHub: $URL"
+curl --fail -L "${URL}" --output ${FILENAME}
 
 curl_exit_status=$?
 if [ $curl_exit_status -ne 0 ]; then
-    echo "An error occured while trying to download keptn."
+    LATEST_KEPTN_VERSION=$(get_latest_version)
+    echo "An error occured while trying to download keptn from GitHub. Please manually download a release from https://github.com/keptn/keptn/releases."
     exit $curl_exit_status
 fi
 
 echo "Unpacking to /tmp ...";
-tar -C /tmp -xvf keptn-install-${KEPTN_VERSION}.tar
+tar -C /tmp -xvf ${FILENAME}
 
 tar_exit_status=$?
 if [ $tar_exit_status -ne 0 ]; then
@@ -83,18 +126,24 @@ if [ $tar_exit_status -ne 0 ]; then
     exit $tar_exit_status
 fi
 
-rm keptn-install-${KEPTN_VERSION}.tar
+# Cleanup: remove the archive
+rm ${FILENAME}
 
 # verifying that /tmp/keptn exists
-ls -la /tmp/keptn
+ls -la /tmp/${BINARY_NAME}
 
 if [ $? -ne 0 ]; then
-    echo "Keptn was not successfully extracted"
+    echo "Keptn binary ${BINARY_NAME} was not successfully extracted"
     exit -1
 fi
 
 echo "Moving keptn binary to /usr/local/bin/keptn"
-chmod +x /tmp/keptn
-mv /tmp/keptn /usr/local/bin/keptn
+chmod +x /tmp/${BINARY_NAME}
+mv /tmp/${BINARY_NAME} /usr/local/bin/keptn
+
+if [ $? -ne 0 ]; then
+    echo "Error: Could not move keptn binary to /usr/local/bin"
+    exit -1
+fi
 
 print_after_installation_info

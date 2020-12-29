@@ -18,7 +18,7 @@ jobs:
     name: Test local get.sh
     strategy:
       matrix:
-        platform: [ ubuntu-20.04, macOS-11.0 ]
+        platform: [ ubuntu-20.04, macOS-11.0, windows-2019 ]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Check out code.
