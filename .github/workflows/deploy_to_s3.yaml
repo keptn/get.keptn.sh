@@ -1,0 +1,47 @@
+name: Deploy To S3
+on:
+  push:
+    branches:
+      - "master"
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Ensure content of src folder is correct
+        run: |
+          # ensure only two files exist in src folder
+          NUM_FILES=$(ls -1 src/ | wc -l)
+  
+          if [ $NUM_FILES -ne 3 ]; then
+            echo "::error::Unexpected files found in src/ folder"
+            ls -la src/
+            exit 1
+          fi
+
+          # ensure that get.sh and version.json exist in src folder
+          cat src/get.sh || exit 1
+          cat src/version.json || exit 1
+          cat src/integrations.html || exit 1
+
+      - name: Deploy src folder S3 bucket
+        run: aws s3 sync ./src/ s3://get.keptn.sh --delete
+      
+      - name: Verify deploy succeeded
+        run: |
+          # validate that the deployment has succeeded
+          # first wait a little bit, as s3 might take some time to update 
+          sleep 10
+          # then try to download get.sh and validate the content is the same as in src/
+          curl -L https://get.keptn.sh --output get.sh
+          diff get.sh src/get.sh || exit 1
+          # finally try to install it
+          curl -sL https://get.keptn.sh | bash || exit 2
+          keptn version

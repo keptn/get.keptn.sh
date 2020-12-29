@@ -1,0 +1,33 @@
+name: Tests
+on:
+  # always execute docker build when something is pushed to master or release-* branches
+  push:
+    branches:
+      - 'master'
+      - 'release-*'
+  # in addition, execute for pull requests to those branches
+  pull_request:
+    branches:
+      - 'master'
+      - 'release-*'
+defaults:
+  run:
+    shell: bash
+jobs:
+  test:
+    name: Test local get.sh
+    strategy:
+      matrix:
+        platform: [ ubuntu-20.04, macOS-11.0, windows-2019 ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Check out code.
+        uses: actions/checkout@v2
+      - name: Try installing Keptn using local get.sh (quickstart)
+        run: cat src/get.sh | bash
+      - name: Verify Keptn CLI works (Windows)
+        if: runner.os == 'Windows'
+        run: ./keptn version
+      - name: Verify Keptn CLI works (Linux, MacOS)
+        if: runner.os != 'Windows'
+        run: keptn version
