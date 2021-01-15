@@ -28,5 +28,9 @@ jobs:
     steps:
       - name: Trying installing Keptn using curl get.keptn.sh (QuickStart)
         run: curl -sL https://get.keptn.sh | bash
-      - name: Verify Keptn CLI works
+      - name: Verify Keptn CLI works (Windows)
+        if: runner.os == 'Windows'
+        run: ./keptn version
+      - name: Verify Keptn CLI works (Linux, MacOS)
+        if: runner.os != 'Windows'
         run: keptn version
