@@ -125,14 +125,20 @@ else
 fi
 
 if [[ "$TARGET_ARCH" == "x86_64" ]] || [[ "$TARGET_ARCH" == "amd64" ]]; then
-    KEPTN_ARCH="amd64"
+    KEPTN_ARCH="amd64" # e.g., every usual x86 64 bit processor for AMD/Intel
 elif [[ "$TARGET_ARCH" == "armv8"* ]] || [[ "$TARGET_ARCH" == "aarch64"* ]] || [[ "$TARGET_ARCH" == "arm64" ]]; then
-    KEPTN_ARCH="arm64"
-elif [[ "$TARGET_ARCH" == "i386" ]] || [[ "$TARGET_ARCH" == "386" ]]; then
-    KEPTN_ARCH="386"
+    KEPTN_ARCH="arm64" # 64 bit ARM processors (raspberry pi 4, chromebooks)
+elif [[ "$TARGET_ARCH" == "armv7"* ]]; then
+    KEPTN_ARCH="arm" # e.g., armv7l on raspberry pi 3
 else
-    echo "Unsupported target architecture $TARGET_ARCH. Please manually download a release from https://github.com/keptn/keptn/releases."
+    echo "Unsupported target architecture $TARGET_ARCH. Please manually download a release from https://github.com/keptn/keptn/releases or build the CLI from source."
     exit 1
+fi
+
+if [[ "$DISTR" == "macOS" ]] && [[ "$KEPTN_ARCH" == "arm64" ]]; then
+    echo "!!! Apple Silicon detected"
+    echo "!!! Apple Silicon support is currently pending, falling back to amd64 for now"
+    KEPTN_ARCH="amd64"
 fi
 
 # allow customizing install directory
