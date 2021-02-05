@@ -26,7 +26,7 @@ print_after_installation_info(){
     TARGET_DIR=${1:-""}
 
     printf "\n"
-    printf "Installation is successfully completed!"
+    printf "Keptn CLI installation completed successfully!"
     printf "\n"
     printf "You can check Keptn installation by running:"
     printf "\n"
@@ -34,17 +34,15 @@ print_after_installation_info(){
     printf "${TARGET_DIR}keptn --help"
     printf "\n"
     printf "\n"
-    printf "Next step you might be interested in is the installation on your cluster. "
-    printf "You can follow the docmentation under https://keptn.sh/docs/ "
-    printf "or simply start off by installing Keptn Control Plane via:"
-    printf "\n"
+    printf "To install Keptn in your cluser, please follow the documentation https://keptn.sh/docs/ or execute "
+    printf "\n"    
     printf "\n"
     printf "${TARGET_DIR}keptn install"
     printf "\n"
     printf "\n"
-    printf "Also, you can find many helpful tutorials in https://tutorials.keptn.sh/"
+    printf "Learn more on how to use Keptn in our tutorials https://tutorials.keptn.sh/"
     printf "\n"
-    printf "Good luck!"
+    printf "Welcome aboard!"
     printf "\n"
 }
 
