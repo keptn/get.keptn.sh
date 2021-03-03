@@ -105,8 +105,8 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     DISTR="linux"
 elif [[ "$UNAME" == "Linux" ]]; then
     DISTR="linux"
-elif [[ "$OSTYPE" == "darwin"* ]]; then # mac os
-    DISTR="macOS"
+elif [[ "$OSTYPE" == "darwin"* ]]; then # MacOS = darwin
+    DISTR="darwin"
 elif [[ "$OSTYPE" == "mingw"* ]] || [[ "$OSTYPE" == "msys" ]]; then # some sort of bash on windows
     DISTR="windows"
 else
@@ -133,7 +133,7 @@ else
     exit 1
 fi
 
-if [[ "$DISTR" == "macOS" ]] && [[ "$KEPTN_ARCH" == "arm64" ]]; then
+if [[ "$DISTR" == "darwin" ]] && [[ "$KEPTN_ARCH" == "arm64" ]]; then
     echo "!!! Apple Silicon detected"
     echo "!!! Apple Silicon support is currently pending, falling back to amd64 for now"
     KEPTN_ARCH="amd64"
@@ -156,6 +156,10 @@ if [ "$(expr "${KEPTN_VERSION_MAJOR_MINOR}" \>= "${ARCH_UNSUPPORTED_MAJOR_MINOR}
     FILENAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz"
     BINARY_NAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}*"
 else
+    # for Keptn 0.7.x and older we don't use "darwin" as the distribution, but macOS
+    if [[ "$DISTR" == "darwin" ]]; then
+      DISTR="macOS"
+    fi
     # for Keptn 0.7.x and older we need to try the old format: ${KEPTN_VERSION}_keptn-${DISTR}.tar
     FILENAME="${KEPTN_VERSION}_keptn-${DISTR}.tar"
     BINARY_NAME="keptn"
