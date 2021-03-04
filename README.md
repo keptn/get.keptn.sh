@@ -33,6 +33,10 @@ Currently, the following parameters are available:
    ```
 
 
+## version.json
+
+The file [version.json](src/version.json) contains information about the latest versions available and upgradepaths.
+
 # License
 
 Please see [LICENSE](LICENSE).
