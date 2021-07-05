@@ -35,7 +35,7 @@ print_after_installation_info(){
     printf "\n"
     printf "\n"
     printf "To install Keptn in your cluser, please follow the documentation https://keptn.sh/docs/ or execute "
-    printf "\n"    
+    printf "\n"
     printf "\n"
     printf "${TARGET_DIR}keptn install"
     printf "\n"
@@ -81,7 +81,7 @@ if ! [ -x "$(command -v awk)" ]; then
     exit 1
 fi
 
-# If KEPTN_VERSION is not provided -> automatically determine latest version 
+# If KEPTN_VERSION is not provided -> automatically determine latest version
 if [[ -z "$KEPTN_VERSION" ]]; then
     KEPTN_VERSION=$(get_latest_version)
     printf "The newest version of Keptn is %s and will be used automatically\n" "${KEPTN_VERSION}"
