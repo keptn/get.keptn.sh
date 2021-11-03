@@ -150,23 +150,9 @@ if [[ -z "$INSTALL_DIRECTORY" ]]; then
     fi
 fi
 
-# Keptn 0.8.0-alpha and above support arch, strip MAJOR and MINOR version so we can compare it
-ARCH_UNSUPPORTED_MAJOR_MINOR="0.8"
-KEPTN_VERSION_MAJOR_MINOR=$(echo "$KEPTN_VERSION" | awk 'match($0, /[0-9]+.[0-9]+*/) { print substr( $0, RSTART, RLENGTH )}' )
-
-if [ "$(expr "${KEPTN_VERSION_MAJOR_MINOR}" \>= "${ARCH_UNSUPPORTED_MAJOR_MINOR}")" -eq 1 ]; then
-    # for Keptn 0.8.x and newer we the format is: keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz
-    FILENAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz"
-    BINARY_NAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}*"
-else
-    # for Keptn 0.7.x and older we don't use "darwin" as the distribution, but macOS
-    if [[ "$DISTR" == "darwin" ]]; then
-      DISTR="macOS"
-    fi
-    # for Keptn 0.7.x and older we need to try the old format: ${KEPTN_VERSION}_keptn-${DISTR}.tar
-    FILENAME="${KEPTN_VERSION}_keptn-${DISTR}.tar"
-    BINARY_NAME="keptn"
-fi
+# for Keptn 0.8.x and newer we the format is: keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz
+FILENAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}.tar.gz"
+BINARY_NAME="keptn-${KEPTN_VERSION}-${DISTR}-${KEPTN_ARCH}*"
 
 # ensure binary name is properly set for windows
 if [[ "$DISTR" == "windows" ]]; then
