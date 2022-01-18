@@ -15,7 +15,7 @@
 
 # Define handy functions
 get_latest_version(){
-   curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
+    curl --silent "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
 }
 
 get_all_versions(){
@@ -166,7 +166,6 @@ curl --fail -L "${URL}" --output ${FILENAME}
 
 curl_exit_status=$?
 if [ $curl_exit_status -ne 0 ]; then
-    LATEST_KEPTN_VERSION=$(get_latest_version)
     echo "An error occured while trying to download keptn from GitHub. Please manually download a release from https://github.com/keptn/keptn/releases."
     exit $curl_exit_status
 fi
