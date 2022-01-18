@@ -15,6 +15,7 @@
 
 # Define handy functions
 get_latest_version(){
+    curl --silent -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name
     debug_tag=$(curl --silent -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name)
     echo "$debug_tag"
     echo "$debug_tag"
