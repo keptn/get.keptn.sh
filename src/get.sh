@@ -15,7 +15,9 @@
 
 # Define handy functions
 get_latest_version(){
-   curl -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
+   release_json=$(curl -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/keptn/keptn/releases/latest")
+   echo "$release_json"
+   echo "$release_json" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
 }
 
 get_all_versions(){
