@@ -16,10 +16,12 @@
 # Define handy functions
 get_latest_version(){
    if [[ -n "$GITHUB_TOKEN" ]]; then
+     echo "we have a token"
     CURL_RESULT=$(curl -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/keptn/keptn/releases/latest")
     echo "$CURL_RESULT"
     echo "$CURL_RESULT" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
   else
+    echo "we don't have a token"
     curl "https://api.github.com/repos/keptn/keptn/releases/latest" | grep tag_name | awk 'match($0, /[0-9]+.[0-9]+.[0-9]+[.\-A-Za-z0-9]*/) { print substr( $0, RSTART, RLENGTH )}'
   fi
 }
