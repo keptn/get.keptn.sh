@@ -15,8 +15,6 @@ jobs:
       - name: Check out code.
         uses: actions/checkout@v2
       - name: Compare Content of get.sh with content of https://get.keptn.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -L https://get.keptn.sh --output get.sh
           diff get.sh src/get.sh || exit 1
@@ -29,6 +27,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Trying installing Keptn using curl get.keptn.sh (QuickStart)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: curl -sL https://get.keptn.sh | bash
       - name: Verify Keptn CLI works (Windows)
         if: runner.os == 'Windows'
