@@ -25,6 +25,8 @@ jobs:
       - name: Check out code.
         uses: actions/checkout@v2
       - name: Try installing Keptn using local get.sh (quickstart)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: cat src/get.sh | bash
       - name: Verify Keptn CLI works (Windows)
         if: runner.os == 'Windows'
