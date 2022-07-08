@@ -29,7 +29,6 @@ jobs:
           # ensure that get.sh and version.json exist in src folder
           cat src/get.sh || exit 1
           cat src/version.json || exit 1
-          cat src/integrations.html || exit 1
 
       - name: Deploy src folder S3 bucket
         run: aws s3 sync ./src/ s3://get.keptn.sh --delete
