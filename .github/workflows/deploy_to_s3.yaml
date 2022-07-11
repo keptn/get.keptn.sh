@@ -20,7 +20,7 @@ jobs:
           # ensure only two files exist in src folder
           NUM_FILES=$(ls -1 src/ | wc -l)
   
-          if [ $NUM_FILES -ne 3 ]; then
+          if [ $NUM_FILES -ne 2 ]; then
             echo "::error::Unexpected files found in src/ folder"
             ls -la src/
             exit 1
@@ -29,11 +29,10 @@ jobs:
           # ensure that get.sh and version.json exist in src folder
           cat src/get.sh || exit 1
           cat src/version.json || exit 1
-          cat src/integrations.html || exit 1
 
       - name: Deploy src folder S3 bucket
-        run: aws s3 sync ./src/ s3://get.keptn.sh --delete
-      
+        # Files will be overwritten but not deleted! integrations.html should persist for a couple of versions.
+        run: aws s3 sync ./src/ s3://get.keptn.sh
       - name: Verify deploy succeeded
         run: |
           # validate that the deployment has succeeded
