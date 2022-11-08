@@ -70,6 +70,7 @@ runAsRoot() {
 version_greater_equal()
 {
     printf '%s\n%s\n' "$2" "$1" | sort --check=quiet --version-sort
+    return $?
 }
 
 
