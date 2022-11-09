@@ -67,13 +67,6 @@ runAsRoot() {
     fi
 }
 
-version_greater_equal()
-{
-    printf '%s\n%s\n' "$2" "$1" | sort --check=quiet --version-sort
-    return $?
-}
-
-
 # Verify sudo is available
 if ! [ -x "$(command -v sudo)" ]; then
     echo "sudo is not available! Installation might fail..."
@@ -148,13 +141,6 @@ elif [[ "$TARGET_ARCH" == "armv7"* ]]; then
 else
     echo "Unsupported target architecture $TARGET_ARCH. Please manually download a release from https://github.com/keptn/keptn/releases or build the CLI from source."
     exit 1
-fi
-
-if [[ "$DISTR" == "darwin" ]] && [[ "$KEPTN_ARCH" == "arm64" ]] && [[ ! version_greater_equal $KEPTN_VERSION 0.9.0 ]] ; then
-    echo "!!! Apple Silicon detected"
-    echo "!!! Native Apple Silicon support is currently pending, falling back to amd64 for now."
-    echo "!!! You should be able to run the Keptn cli using Rosetta 2 - read https://support.apple.com/en-us/HT211861 for more information)."
-    KEPTN_ARCH="amd64"
 fi
 
 # allow customizing install directory
