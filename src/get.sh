@@ -143,13 +143,6 @@ else
     exit 1
 fi
 
-if [[ "$DISTR" == "darwin" ]] && [[ "$KEPTN_ARCH" == "arm64" ]]; then
-    echo "!!! Apple Silicon detected"
-    echo "!!! Native Apple Silicon support is currently pending, falling back to amd64 for now."
-    echo "!!! You should be able to run the Keptn cli using Rosetta 2 - read https://support.apple.com/en-us/HT211861 for more information)."
-    KEPTN_ARCH="amd64"
-fi
-
 # allow customizing install directory
 if [[ -z "$INSTALL_DIRECTORY" ]]; then
     # if we are not on windows, we know that we should install to /usr/local/bin
