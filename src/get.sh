@@ -42,7 +42,7 @@ print_after_installation_info(){
     printf "${TARGET_DIR}keptn --help"
     printf "\n"
     printf "\n"
-    printf "To install Keptn in your cluster, please follow the documentation at https://keptn.sh/docs/install"
+    printf "To install Keptn in your cluster, please follow the documentation at https://keptn.sh/docs/"
     printf "\n"
     printf "\n"
     printf "Learn more on how to use Keptn in our tutorials at https://tutorials.keptn.sh/"
