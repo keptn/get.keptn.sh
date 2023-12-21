@@ -1,6 +1,6 @@
 # get.keptn.sh repository
 
-## Keptn V1 has reached end of life on December 22nd, 2023 and has been replaced.
+## Keptn V1 has reached end of life on December 22nd, 2023 and has been [replaced](https://github.com/keptn/lifecycle-toolkit).
 
 This repo is part of the [Keptn Project](https://keptn.sh) and provides the following two files:
 
